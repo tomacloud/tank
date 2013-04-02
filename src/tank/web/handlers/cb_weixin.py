@@ -31,6 +31,6 @@ class CbWeixinHandler(BaseHandler):
         me = req_data["ToUserName"]
         user = req_data["FromUserName"]
         
-        resp_xml = weixin_utils.gen_text_response(user, me, u"欢迎您关注")
+        resp_xml = weixin_utils.gen_text_response(user, me, u"%s 欢迎您关注" % (user, ))
         
         self.write(resp_xml)
