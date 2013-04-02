@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 from tank.web.deps import *
+from tank.weixin import utils as weixin_utils
 
 class CbWeixinHandler(BaseHandler):
     def get(self):
@@ -13,9 +14,11 @@ class CbWeixinHandler(BaseHandler):
 
             print "request params - signature: %s, timestamp: %s ,nonce: %s, echostr: %s" % (signature, timestamp, nonce, echostr)
 
-            if utils.check_signature(config.TOKEN, signature, timestamp, nonce):
+            if weixin_utils.check_signature(self.app_config['weixin_token'], signature, timestamp, nonce):
                 self.write(echostr)
             else:
                 pass # do nothing
         except Exception, e:
+            if self.app_config['runtime'] == 'development':
+                raise e
             pass
