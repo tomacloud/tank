@@ -1,6 +1,6 @@
 #!/bin/sh
 
-virtuanenv venv
+virtualenv venv
 
 . venv/bin/activate 
 
