@@ -5,6 +5,7 @@ import os
 print os.getcwd()
 
 from tank.web.deps import *
+from tank.web.handlers import *
 
 class IndexHandler(BaseHandler):
     def get(self):
@@ -141,11 +142,10 @@ if __name__ == '__main__':
                 dict(app_config = app_config,
                      Session    = Session))
 
-    from tank.web.handlers.testinghandler import TestingHandler
-
     app = Application(
         [ build_handler(r'/', IndexHandler),
           build_handler(r'/testing', TestingHandler),
+          build_handler(r'/cb/weixin', CbWeixinHandler),
           ],
         **settings
         )
