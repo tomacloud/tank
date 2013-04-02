@@ -1,5 +1,8 @@
 global:
 
+  weixin_token: 5b6fc4d19b7511e2bdb0c8bcc88efaac
+  weixin_callback: http://weixin.dev.longmaworks.com/cb/weixin
+
 production:
   mysql:
     username: tank
