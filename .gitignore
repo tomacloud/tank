@@ -18,6 +18,9 @@ classes/
 .project
 .settings/
 
+venv/
+.python-eggs/
+
 # switch to regexp syntax.
 syntax: regexp
 Guardfile

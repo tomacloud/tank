@@ -129,9 +129,9 @@ if __name__ == '__main__':
 
 
     settings = dict(
-        cookie_secret   = 'aba4dde9a0b34218b2c2929b1e5d611c',
+        cookie_secret   = 'e7fd35339b7411e29298c8bcc88efaac',
         debug           = debug,
-        template_path   = "%s/views/" % (app_config['running_home']),
+        template_path   = "%s/src/tpls/" % (app_config['running_home']),
         login_url       = '/signin',
         )
     
@@ -141,11 +141,11 @@ if __name__ == '__main__':
                 dict(app_config = app_config,
                      Session    = Session))
 
-    #from tame.web.handlers.api.v0.listhandler import *
+    from tank.web.handlers.testinghandler import TestingHandler
 
     app = Application(
         [ build_handler(r'/', IndexHandler),
-          
+          build_handler(r'/testing', TestingHandler),
           ],
         **settings
         )
