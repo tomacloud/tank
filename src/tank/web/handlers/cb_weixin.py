@@ -19,5 +19,6 @@ class CbWeixinHandler(BaseHandler):
             else:
                 pass # do nothing
         except Exception, e:
-            raise e
+            if self.app_config['runtime'] == 'development':
+                raise e
             pass
