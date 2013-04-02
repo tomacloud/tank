@@ -40,7 +40,7 @@ def dict_to_xml(data):
         node.text = text if is_number(text) else etree.CDATA(text)
         root.append(node)
         
-    return etree.tostring(root)
+    return etree.tostring(root, encoding = "utf-8")
 
 def gen_response_dict(to_user, from_user, msg_type):
     data = dict()
