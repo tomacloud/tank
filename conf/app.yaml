@@ -1,0 +1,34 @@
+global:
+
+production:
+  mysql:
+    username: tank
+    password: tank_pwd
+    
+    host_master: localhost
+    port_master: 3306
+
+    host_slave: localhost
+    port_slave: 3306
+
+    database: tank
+
+    echo: false
+
+testing:
+
+development:
+
+  mysql:
+    username: tank
+    password: tank
+    
+    host_master: localhost
+    port_master: 3306
+
+    host_slave: localhost
+    port_slave: 3306
+
+    database: tank
+
+    echo: false

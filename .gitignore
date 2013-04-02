@@ -1,0 +1,25 @@
+# use glob syntax.
+syntax: glob
+
+
+*.elc
+*.pyc
+*.wsgic
+*.bak
+*~
+.DS_Store
+*#
+.sass-cache/
+src/static/js/lib/firebug-lite/
+src/static/json/*.json
+
+classes/
+.classpath
+.project
+.settings/
+
+# switch to regexp syntax.
+syntax: regexp
+Guardfile
+Gemfile
+Gemfile.lock
