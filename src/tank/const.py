@@ -4,3 +4,5 @@
 
 PROJECT_NAME='TANK'
 
+
+r_numberic = r'^\d+$'

@@ -2,6 +2,10 @@
 #-*- coding:utf-8 -*-
 
 import datetime
+import time
+
+def now_timestamp():
+    return int(time.time())
 
 def dt_to_str(dt, format='%Y-%m-%d %H:%M:%S'):
     if dt:

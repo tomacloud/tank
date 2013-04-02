@@ -22,3 +22,15 @@ class CbWeixinHandler(BaseHandler):
             if self.app_config['runtime'] == 'development':
                 raise e
             pass
+
+    def post(self):
+        req_xml = self.request.body
+
+        req_data = weixin_utils.xml_to_dict(req_xml)
+        
+        me = req_data["ToUserName"]
+        user = req_data["FromUserName"]
+        
+        resp_xml = weixin_utils.gen_text_response(user, me, u"欢迎您关注")
+        
+        self.write(resp_xml)
