@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     print options, dir(options)
     print options.port, options.running_dir
-    app_config = config.build(const.PROJECT_NAME, options.running_dir)
+    app_config = config.build(options.running_dir)
 
     for k, v in app_config.iteritems():
         if not isinstance(v, unicode):
