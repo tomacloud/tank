@@ -61,12 +61,8 @@ def _process(app_config):
     else:
         return app_config
 
-            
 
-def load(cfg_file, runtime='development'):
-    stream = file(cfg_file, 'r')
-    conf = yaml.load(stream)
-
+def _parse(conf, runtime='development'):
     final_conf = {}
     if 'global' in conf and isinstance(conf['global'], dict):
         final_conf = conf['global']
@@ -81,47 +77,46 @@ def load(cfg_file, runtime='development'):
     final_conf['runtime'] = runtime
     if 'application' in conf:
         final_conf['application'] = conf['application']
+        
     return final_conf
 
-def build(proj_name, running_dir = ''):
+def build(running_dir = ''):
     global _loaded, _config
     if _loaded:
         return _config
     
     import sys
 
-    project_prefix = proj_name.upper().replace('.', '_')
 
-    home_env_name = project_prefix + '_HOME'
     """
+    home_env_name = project_prefix + '_HOME'
     if not home_env_name in os.environ:
         print 'Please set environment variable %s' % (home_env_name,)
         exit()
     """
         
-    home_dir = os.environ[home_env_name] if home_env_name in os.environ else None
-    if home_dir:
-        config_dir =  '%s/src/conf' % (home_dir, )
-        config_file = '%s/src/conf/app.yaml' % (home_dir, )
-        local_config_file = '%s/src/conf/app.local.yaml' % (home_dir, )
-    else:
-        config_dir =  "%s/conf" % (running_dir, )
-        config_file = "%s/conf/app.yaml" % (running_dir, )
-        local_config_file = '%s/conf/app.local.yaml' % (running_dir, )
+    config_dir =  "%s/conf" % (running_dir, )
+    config_file = "%s/conf/app.yaml" % (running_dir, )
+    local_config_file = '%s/conf/app.local.yaml' % (running_dir, )
         
     if not os.path.exists(config_file):
         print 'No application configuration file found, in ', config_file
         exit()
 
-    runtime_name = project_prefix + '_RUNTIME'
+    stream = file(config_file, 'r')
+    conf = yaml.load(stream)
+    app_name = conf['application']['name']
+    
+    app_prefix = app_name.upper().replace('.', '_')
+    runtime_name = app_prefix + '_RUNTIME'
     runtime = runtime_name in os.environ and os.environ[runtime_name] or 'development'
-
-    config = load(config_file, runtime)
-
+    
+    config = _parse(conf, runtime)
     if os.path.exists(local_config_file):
         stream = file(local_config_file, 'r')
         local_conf = yaml.load(stream)
-        config.update(local_conf)
+        if local_conf:
+            config.update(local_conf)
 
     config['runtime'] = runtime
     config['running_home'] = running_dir
