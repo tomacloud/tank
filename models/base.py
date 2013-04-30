@@ -3,7 +3,7 @@
 
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy import Table, MetaData, Column
-from sqlalchemy import Integer, Unicode, UnicodeText, Boolean, DateTime, Float, Text
+from sqlalchemy import Integer, String, Unicode, UnicodeText, Boolean, DateTime, Float, Text
 from sqlalchemy.orm import mapper
 
 from sqlalchemy import or_
@@ -12,7 +12,6 @@ from sqlalchemy import or_
 #metadata = MetaData()
 
 #print Base.__metaclass__
-
 
 """
 def parse_fields(instance, d):
