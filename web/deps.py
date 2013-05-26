@@ -3,8 +3,10 @@
 
 import json
 import urllib
-import datetime
+import datetime, time
 import traceback
+import base64
+import md5
 
 from tornado.web import RequestHandler
 from tornado.web import Application
@@ -24,12 +26,97 @@ from tank.models import utils as models_uuids
 from tank.models import *
 #from tame.services import *
 
+VERSION_1_SALT = 'a5cd9026'
+
+def encode_user_token(uid, params = {}, version=1):
+    uid = str(uid)
+    params['uid']  = uid
+    params['created_at'] = int(time.time())
+
+    param_fragments = []
+    for param in sorted(params.iteritems(), key=lambda x: x[0]):
+        param_fragments.append('%s=%s' % (param[0], param[1]))
+
+    s = '&'.join(param_fragments)
+    if version != 1:
+        return None
+    elif version == 1:
+        #only base64
+        s = base64.b64encode(s).replace('+','-').replace('/','_').replace('=','')
+        verify_code = md5.md5(uid + VERSION_1_SALT + s).hexdigest()[:8]
+        
+        s = "%s.%s.%s" % (version, s, verify_code)
+        return s
+        
+def decode_user_token(user_token):
+    parts = user_token.split('.')
+    #print parts
+    if not len(parts) == 3:
+        return 'wrong token', None
+
+    if parts[0] != '1':
+        return 'wrong version', None
+
+    d = parts[1].replace('-', '+').replace('_','/')
+    #print len(d), len(d) % 4
+    if len(d) % 4 != 0:
+        d = d + '=' * (4 - len(d) % 4)
+    #print d
+    d = base64.b64decode(d)
+    #print d
+
+    salt = ''
+    if parts[0] == '1':
+        params = {}
+        for pair in d.split('&'):
+            pair = pair.split('=')
+            params[pair[0]] = pair[1]
+        salt = VERSION_1_SALT
+
+    if not 'uid' in params:
+        return 'no uid', None
+
+    verify_code = md5.md5(params['uid'] + salt + parts[1]).hexdigest()[:8]
+    if verify_code != parts[2]:
+        return 'verify code don`t match', None
+
+    return None, params
+
+def need_login(func):
+    def wrapper(*args, **kwargs):
+        handler = None
+        if len(args) > 0:
+            handler = args[0]
+
+        if handler and isinstance(handler, RequestHandler):
+            user = handler.get_current_user()
+            if not user:
+                uri = handler.request.uri
+                return handler.redirect("/login?back_url=" + uri)
+
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
 class BaseHandler(RequestHandler):
 
     def initialize(self, app_config, Session):
         self.app_config = app_config
         self.Session = Session
         self.db_session = None
+
+    def get_current_user(self):
+        user_token = self.get_cookie('user_token')
+        if not user_token:
+            return None
+
+        ret, params = decode_user_token(user_token)
+        if ret:
+            print params
+            return None
+        else:
+            return params
 
     def get_db_session(self):
         if not self.db_session:
