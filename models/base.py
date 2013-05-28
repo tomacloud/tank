@@ -90,3 +90,17 @@ class Entity(object):
         
 
 Base = declarative_base()
+
+def wrapper_property(name, default_prop):
+    def wrapper_func(func):
+        def _(*args, **kwargs):
+            obj = args[0]
+            if hasattr(obj, name):
+                return getattr(obj, name)
+            _prop = func(*args, **kwargs)
+            if not _prop:
+                _prop = default_prop
+            setattr(obj, name, _prop)
+            return _prop
+        return _
+    return wrapper_func
