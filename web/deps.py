@@ -230,6 +230,8 @@ class BaseHandler(RequestHandler):
 
     def render(self, template_name, **kwargs):
         kwargs["app_config"] = self.app_config
+        kwargs["db_session"] = self.get_db_session()
+        kwargs['handler'] = self
         return RequestHandler.render(self, template_name, **kwargs)
     
 def seed_user_token_cookie(cookie_name = None):
