@@ -5,6 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy import Table, MetaData, Column
 from sqlalchemy import Integer, String, Unicode, UnicodeText, Boolean, DateTime, Float, Text
 from sqlalchemy.orm import mapper
+from sqlalchemy.orm import class_mapper
 
 from sqlalchemy import or_
 
@@ -87,7 +88,26 @@ class Entity(object):
 
 
         return d
-        
+
+    @classmethod
+    def get_by_pk(cls, db_session, *args, **kvargs):
+        q = db_session.query(cls)
+
+        if len(kvargs) > 0:
+            return q.filter_by(**kvargs).first()
+
+        if len(args) > 0:
+            try:
+                name = class_mapper(cls).primary_key[0].name
+                return q.filter_by(**{name : args[0]}).first()
+            except IndexError, e:
+                raise ValueError('Table not have a primary key')
+
+        return None
+
+    @classmethod
+    def get_all(cls, db_session):
+        return db_session.query(cls).all()
 
 Base = declarative_base()
 
