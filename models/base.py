@@ -109,7 +109,7 @@ class Entity(object):
     def get_all(cls, db_session):
         return cls.get_all_by(db_session)
 
-    @classmthod
+    @classmethod
     def _get_by(cls, db_session, **kvargs):
         q = db_session.query(cls)
         if len(kvargs) > 0:
