@@ -107,7 +107,23 @@ class Entity(object):
 
     @classmethod
     def get_all(cls, db_session):
-        return db_session.query(cls).all()
+        return cls.get_all_by(db_session)
+
+    @classmthod
+    def _get_by(cls, db_session, **kvargs):
+        q = db_session.query(cls)
+        if len(kvargs) > 0:
+            q = q.filter_by(**kvargs)
+
+        return q
+
+    @classmethod
+    def get_by(cls, db_session, **kvargs):
+        return cls._get_by(db_session, **kvargs).first()
+
+    @classmethod
+    def get_all_by(cls, db_session, **kvargs):
+        return cls._get_by(db_session, **kvargs).all()
 
 Base = declarative_base()
 
