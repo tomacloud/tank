@@ -4,8 +4,7 @@
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy import Table, MetaData, Column
 from sqlalchemy import Integer, String, Unicode, UnicodeText, Boolean, DateTime, Float, Text
-from sqlalchemy.orm import mapper
-from sqlalchemy.orm import class_mapper
+from sqlalchemy.orm import mapper, class_mapper
 
 from sqlalchemy import or_
 
@@ -124,6 +123,10 @@ class Entity(object):
     @classmethod
     def get_all_by(cls, db_session, **kvargs):
         return cls._get_by(db_session, **kvargs).all()
+
+    def set_attrs_by_handler(self, handler, attrs):
+        for attr in attrs:
+            setattr(self, attr, handler.get_argument(attr, None))
 
 Base = declarative_base()
 
