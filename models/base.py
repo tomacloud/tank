@@ -3,11 +3,9 @@
 
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy import Table, MetaData, Column
-from sqlalchemy import Integer, String, Unicode, UnicodeText, Boolean, DateTime, Float, Text
+from sqlalchemy import Integer, String, Unicode, UnicodeText, Boolean, DateTime, Float, Text, Binary
 from sqlalchemy.orm import mapper
-
-from sqlalchemy import or_
-
+from sqlalchemy import func, or_
 
 #metadata = MetaData()
 
