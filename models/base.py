@@ -4,7 +4,7 @@
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy import Table, MetaData, Column
 from sqlalchemy import Integer, String, Unicode, UnicodeText, Boolean, DateTime, Float, Text, Binary
-from sqlalchemy.orm import mapper
+from sqlalchemy.orm import mapper, class_mapper
 from sqlalchemy import func, or_
 
 #metadata = MetaData()
@@ -85,7 +85,46 @@ class Entity(object):
 
 
         return d
-        
+
+    @classmethod
+    def get_by_pk(cls, db_session, *args, **kvargs):
+        q = db_session.query(cls)
+
+        if len(kvargs) > 0:
+            return q.filter_by(**kvargs).first()
+
+        if len(args) > 0:
+            try:
+                name = class_mapper(cls).primary_key[0].name
+                return q.filter_by(**{name : args[0]}).first()
+            except IndexError, e:
+                raise ValueError('Table not have a primary key')
+
+        return None
+
+    @classmethod
+    def get_all(cls, db_session):
+        return cls.get_all_by(db_session)
+
+    @classmethod
+    def _get_by(cls, db_session, **kvargs):
+        q = db_session.query(cls)
+        if len(kvargs) > 0:
+            q = q.filter_by(**kvargs)
+
+        return q
+
+    @classmethod
+    def get_by(cls, db_session, **kvargs):
+        return cls._get_by(db_session, **kvargs).first()
+
+    @classmethod
+    def get_all_by(cls, db_session, **kvargs):
+        return cls._get_by(db_session, **kvargs).all()
+
+    def set_attrs_by_handler(self, handler, attrs):
+        for attr in attrs:
+            setattr(self, attr, handler.get_argument(attr, None))
 
 Base = declarative_base()
 
