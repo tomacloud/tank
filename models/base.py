@@ -103,11 +103,11 @@ class Entity(object):
         return None
 
     @classmethod
-    def get_all(cls, db_session):
-        return cls.get_all_by(db_session)
+    def get_all(cls, db_session, **kvargs):
+        return cls.get_all_by(db_session, **kvargs)
 
     @classmethod
-    def _get_by(cls, db_session, **kvargs):
+    def _get_query(cls, db_session, **kvargs):
         q = db_session.query(cls)
         if len(kvargs) > 0:
             q = q.filter_by(**kvargs)
@@ -116,11 +116,31 @@ class Entity(object):
 
     @classmethod
     def get_by(cls, db_session, **kvargs):
-        return cls._get_by(db_session, **kvargs).first()
+        return cls._get_query(db_session, **kvargs).first()
 
     @classmethod
     def get_all_by(cls, db_session, **kvargs):
-        return cls._get_by(db_session, **kvargs).all()
+        limit = offset = None
+        
+        if 'limit' in kvargs:
+            limit = kvargs['limit']
+            del kvargs['limit']
+
+        if 'offset' in kvargs:
+            limit = kvargs['offset']
+            del kvargs['offset']
+
+        print kvargs
+            
+        q = cls._get_query(db_session, **kvargs)
+
+        if limit:
+            q = q.limit(limit)
+
+        if offset:
+            q = q.offset(offset)
+
+        return q.all()
 
     def set_attrs_by_handler(self, handler, attrs):
         for attr in attrs:
