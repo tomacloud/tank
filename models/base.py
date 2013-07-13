@@ -109,8 +109,26 @@ class Entity(object):
     @classmethod
     def _get_query(cls, db_session, **kvargs):
         q = db_session.query(cls)
+
+        limit = offset = None
+
+        if 'limit' in kvargs:
+            limit = kvargs['limit']
+            del kvargs['limit']
+
+        if 'offset' in kvargs:
+            offset = kvargs['offset']
+            del kvargs['offset']
+
         if len(kvargs) > 0:
             q = q.filter_by(**kvargs)
+
+        # limit and offset method must invoke after filter_by
+        if limit:
+            q = q.limit(limit)
+
+        if offset:
+            q = q.offset(offset)
 
         return q
 
