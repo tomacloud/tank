@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import inspect
+
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy import Table, MetaData, Column
 from sqlalchemy import Integer, String, Unicode, UnicodeText, Boolean, DateTime, Float, Text, Binary
@@ -36,11 +38,66 @@ class QueryableEntity(type):
 
 print  QueryableEntity        
 """
+
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+class SessionHolder(object):
+    __metaclass__ = Singleton
+
+    def __init__(self, Session):
+        self.Session = Session
+
+    def get_db_session(self):
+        return self.Session()
+
+    def close_session(self, db_session):
+        if db_session:
+            db_session.close()
+            self.Session.remove()
+
+    @classmethod
+    def need_session(instance, func):
+        def wrapper(*args, **kwargs):
+            func_args = inspect.getargspec(func)[0]
+            if not 'db_session' in func_args:
+                return func(*args, **kwargs)
+            else:
+                has_db_session = False
+                if 'db_session' in kwargs and kwargs['db_session']:
+                    has_db_session = True
+
+                if not has_db_session:
+                    idx = func_args.index('db_session')
+                    has_db_session = idx < len(args)
+
+                if not has_db_session:
+                    db_session = SessionHolder().get_db_session()
+                    kwargs['db_session'] = db_session
+                    ret = func(*args, **kwargs)
+                    SessionHolder().close_session(db_session)
+                    return ret
+
+        return wrapper
+    
+
 class Entity(object):
 
     __table__ = None
 
     __ignore_fields__ = []
+
+    @classmethod
+    def get_db_session(cls):
+        from tank import config
+        Session = config.build_db_session(app_config)
+
+        
+        
 
     def __str__(self):
         return self.__repr__()

@@ -4,6 +4,7 @@
 import os
 print os.getcwd()
 
+from tank.models.base import SessionHolder
 from tank.web.deps import *
 from tank.web.handlers import *
 
@@ -34,6 +35,7 @@ if __name__ == '__main__':
         print "%s\t\t= %s" % (str(k), v)
 
     Session = config.build_db_session(app_config)
+    SessionHolder(Session)
 
     debug = app_config['runtime'] == 'development'
 
