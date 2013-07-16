@@ -15,8 +15,6 @@ from tornado import ioloop
 
 import tornado.escape
 
-import tornadoext.oauth2
-
 from tank import const
 from tank import config
 from tank import dtutils
