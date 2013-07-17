@@ -168,7 +168,7 @@ def build_db_session(app_config):
                            echo=echo)
     #some_engine = create_engine('postgresql://scott:tiger@localhost/')
     Session = scoped_session(
-        sessionmaker(bind=engine, autocommit = True, autoflush=True)
+        sessionmaker(bind=engine, autocommit=True, autoflush=True, expire_on_commit=False)
     )
 
     return Session
