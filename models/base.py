@@ -5,7 +5,7 @@ import inspect
 
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy import Table, MetaData, Column
-from sqlalchemy import Integer, String, Unicode, UnicodeText, Boolean, DateTime, Float, Text, Binary
+from sqlalchemy import Integer, String, Unicode, UnicodeText, Boolean, DateTime, Float, Text, Binary, DECIMAL
 from sqlalchemy.orm import mapper, class_mapper
 from sqlalchemy import func, or_
 
@@ -144,20 +144,11 @@ class Entity(object):
         return d
 
     @classmethod
-    def get_by_pk(cls, db_session, *args, **kvargs):
+    @SessionHolder.need_session
+    def get_by_pk(cls, pk = None, db_session = None):
         q = db_session.query(cls)
-
-        if len(kvargs) > 0:
-            return q.filter_by(**kvargs).first()
-
-        if len(args) > 0:
-            try:
-                name = class_mapper(cls).primary_key[0].name
-                return q.filter_by(**{name : args[0]}).first()
-            except IndexError, e:
-                raise ValueError('Table not have a primary key')
-
-        return None
+        name = class_mapper(cls).primary_key[0].name
+        return q.filter_by(**{name : pk}).first()
 
     @classmethod
     def get_all(cls, db_session, **kvargs):
