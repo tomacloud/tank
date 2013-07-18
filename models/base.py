@@ -210,25 +210,7 @@ class Entity(object):
 
     @classmethod
     def get_all_by(cls, db_session, **kvargs):
-        limit = offset = None
-        
-        if 'limit' in kvargs:
-            limit = kvargs['limit']
-            del kvargs['limit']
-
-        if 'offset' in kvargs:
-            limit = kvargs['offset']
-            del kvargs['offset']
-
-        q = cls._get_query(db_session, **kvargs)
-
-        if limit:
-            q = q.limit(limit)
-
-        if offset:
-            q = q.offset(offset)
-
-        return q.all()
+        return cls._get_query(db_session, **kvargs).all()
 
     def set_attrs_by_handler(self, handler, attrs):
         for attr in attrs:
