@@ -81,6 +81,8 @@ class SessionHolder(object):
                     ret = func(*args, **kwargs)
                     SessionHolder().close_session(db_session)
                     return ret
+                else:
+                    return func(*args, **kwargs)
 
         return wrapper
     
