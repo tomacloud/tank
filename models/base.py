@@ -143,6 +143,11 @@ class Entity(object):
 
         return d
 
+    @SessionHolder.need_session
+    def delete(self, db_session = None):
+        with db_session.begin():
+            db_session.delete(self)
+            db_session.flush()
 
     @SessionHolder.need_session
     def save(self, db_session = None):
