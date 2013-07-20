@@ -7,7 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy import Table, MetaData, Column
 from sqlalchemy import Integer, String, Unicode, UnicodeText, Boolean, DateTime, Float, Text, Binary, DECIMAL
 from sqlalchemy.orm import mapper, class_mapper
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, desc
 
 #metadata = MetaData()
 
@@ -198,15 +198,27 @@ class Entity(object):
             offset = kvargs['offset']
             del kvargs['offset']
 
-        if len(kvargs) > 0:
-            q = q.filter_by(**kvargs)
-
         # limit and offset method must invoke after filter_by
         if limit:
             q = q.limit(limit)
 
         if offset:
             q = q.offset(offset)
+
+        if 'order_by' in kvargs:
+            order_by = kvargs['order_by']
+            del kvargs['order_by']
+            order_by_list = order_by.split(' ')
+            for ob in order_by_list:
+                if ob.startswith('-'):
+                    q = q.order_by(desc(ob[1:]))
+                else:
+                    if ob.startswith('+'):
+                        ob = ob[1:]
+                    q = q.order_by(ob)
+        
+        if len(kvargs) > 0:
+            q = q.filter_by(**kvargs)
 
         return q
 
@@ -216,7 +228,8 @@ class Entity(object):
         return cls._get_query(db_session, **kvargs).first()
 
     @classmethod
-    def get_all_by(cls, db_session, **kvargs):
+    @SessionHolder.need_session
+    def get_all_by(cls, db_session = None, **kvargs):
         return cls._get_query(db_session, **kvargs).all()
 
     def set_attrs_by_handler(self, handler, attrs):
