@@ -198,6 +198,9 @@ class Entity(object):
             offset = kvargs['offset']
             del kvargs['offset']
 
+        if len(kvargs) > 0:
+            q = q.filter_by(**kvargs)
+
         # limit and offset method must invoke after filter_by
         if limit:
             q = q.limit(limit)
@@ -216,9 +219,6 @@ class Entity(object):
                     if ob.startswith('+'):
                         ob = ob[1:]
                     q = q.order_by(ob)
-        
-        if len(kvargs) > 0:
-            q = q.filter_by(**kvargs)
 
         return q
 
