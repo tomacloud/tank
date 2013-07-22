@@ -173,6 +173,13 @@ def build_db_session(app_config):
 
     return Session
 
+def quick_config(running_dir):
+    app_config = build(running_dir)
+    Session = build_db_session(app_config)
+    from tank.models.base import SessionHolder
+    SessionHolder(Session)
+    return app_config
+
 
 if __name__ == '__main__':
     pass

@@ -201,9 +201,14 @@ class Entity(object):
         if 'order_by' in kvargs:
             order_by = kvargs['order_by']
             del kvargs['order_by']
-            
-        if len(kvargs) > 0:
-            q = q.filter_by(**kvargs)
+
+
+        cols = cls.__table__.c
+        for k, v in kvargs.iteritems():
+            if isinstance(v, list):
+                q = q.filter(cols[k].in_(v))
+            else:
+                q = q.filter(cols[k] == v)
 
         if order_by:
             order_by_list = order_by.split(' ')
