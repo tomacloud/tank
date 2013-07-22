@@ -188,7 +188,7 @@ class Entity(object):
     def _get_query(cls, db_session, **kvargs):
         q = db_session.query(cls)
 
-        limit = offset = None
+        order_by = limit = offset = None
 
         if 'limit' in kvargs:
             limit = kvargs['limit']
@@ -198,19 +198,14 @@ class Entity(object):
             offset = kvargs['offset']
             del kvargs['offset']
 
-        if len(kvargs) > 0:
-            q = q.filter_by(**kvargs)
-
-        # limit and offset method must invoke after filter_by
-        if limit:
-            q = q.limit(limit)
-
-        if offset:
-            q = q.offset(offset)
-
         if 'order_by' in kvargs:
             order_by = kvargs['order_by']
             del kvargs['order_by']
+            
+        if len(kvargs) > 0:
+            q = q.filter_by(**kvargs)
+
+        if order_by:
             order_by_list = order_by.split(' ')
             for ob in order_by_list:
                 if ob.startswith('-'):
@@ -220,6 +215,13 @@ class Entity(object):
                         ob = ob[1:]
                     q = q.order_by(ob)
 
+        if limit:
+            q = q.limit(limit)
+
+        if offset:
+            q = q.offset(offset)
+
+        
         return q
 
     @classmethod
