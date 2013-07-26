@@ -181,7 +181,8 @@ class Entity(object):
         return q.filter_by(**{name : pk}).first()
 
     @classmethod
-    def get_all(cls, db_session, **kvargs):
+    @SessionHolder.need_session
+    def get_all(cls, db_session = None, **kvargs):
         return cls.get_all_by(db_session, **kvargs)
 
     @classmethod
