@@ -238,7 +238,18 @@ class Entity(object):
     @classmethod
     @SessionHolder.need_session
     def get_all_by(cls, db_session = None, **kvargs):
-        return cls._get_query(db_session, **kvargs).all()
+        objs = cls._get_query(db_session, **kvargs).all()
+        for k, v in kvargs.iteritems():
+            if isinstance(v, list):
+                new_ordered = []
+                for _v in v:
+                    for o in objs:
+                        if getattr(o, k) == _v:
+                            new_ordered.append(o)
+                return new_ordered
+
+        return objs
+
 
     def set_attrs_by_handler(self, handler, attrs):
         for attr in attrs:
