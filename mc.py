@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import re
+import inspect
 import memcache
 
 client_attrs = dir(memcache.Client)
 
 def noop(*args): return None
-
 
 class DummyClient:
     def __getattr__(self, name):
@@ -15,14 +16,21 @@ class DummyClient:
         else:
             return noop
 
+class NullClient(object):
+    def __getattr__(self, name):
+        raise ValueError("'Client' has not yet been generated")
 
-client = DummyClient()
+
+client = NullClient()
 
 
 def create_client(app_config):
     global client
 
-    if not client:
+    if not client or isinstance(client, NullClient):
+        if not app_config.has_key('memcached'):
+            client = DummyClient()
+        
         mem_config = app_config['memcached']
 
         mem_url = "%s:%s" % (mem_config['host'], mem_config['port'])
@@ -32,18 +40,58 @@ def create_client(app_config):
 
     return client
 
+def cache(key_template):
+    def wrapper(func):
+        def wrapper_inner(*args, **kwargs):
+            func_argspec = inspect.getargspec(func)
+            func_args = func_argspec[0]
+            func_defaults = func_argspec[3]
+
+            for k, v in zip(func_args, args):
+                kwargs[k] = v
+
+            for k, v in zip(reversed(func_args), reversed(func_defaults)):
+                if not kwargs.has_key(k):
+                    kwargs[k] = v
+
+
+            key = re.sub(r'\{\w+\}', lambda m: (str(kwargs[m.group(0)[1:-1]]) if m.group(0) else m.group(0)), key_template)
+
+            value = client.get(key)
+            if not value:
+                value = func(*args, **kwargs)
+                client.set(key, value)
+
+            return value
+
+        return wrapper_inner
+
+    return wrapper
+
+
 if __name__ == "__main__":
 
-    try:
-        client.xxx()
-        raise Exception('client.xxx is not raise an exception')
+    from tank import config
+    app_config = config.quick_config('/opt/var/site/')
 
-    except AttributeError, e:
-        pass
+    @cache('get-name-{id}-{name}')
+    def get_name(id, name="meng"):
+        print 'not use cache'
+        return '123'
 
-    except Exception, e:
-        raise Exception
+    class CacheTest:
 
+        @cache('class-get-name-{id}')
+        def get_name(self, id=123, name="kona"):
+            print 'not use cache'
+            return '123'
+    
+    create_client(app_config)
 
-    assert(client.get('name') == None)
-    assert(client.set('name', 'value') == None)
+    cache_test = CacheTest()
+
+    print cache_test.get_name(2, name='abc')
+    print cache_test.get_name(1)
+
+    print get_name(2, name='yinwm')
+    print get_name(1)
