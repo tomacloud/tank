@@ -176,8 +176,14 @@ def build_db_session(app_config):
 def quick_config(running_dir):
     app_config = build(running_dir)
     Session = build_db_session(app_config)
+
     from tank.models.base import SessionHolder
     SessionHolder(Session)
+
+    if app_config.has_key('memcached'):
+        from tank import mc
+        mc.create_client(app_config)
+
     return app_config
 
 

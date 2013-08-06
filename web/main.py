@@ -36,6 +36,9 @@ if __name__ == '__main__':
 
     Session = config.build_db_session(app_config)
     SessionHolder(Session)
+    if app_config.has_key('memcached'):
+        from tank import mc
+        mc.create_client(app_config)
 
     debug = app_config['runtime'] == 'development'
 
