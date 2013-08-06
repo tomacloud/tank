@@ -3,12 +3,26 @@
 
 import memcache
 
-client = None
+client_attrs = dir(memcache.Client)
+
+def noop(*args): return None
+
+
+class DummyClient:
+    def __getattr__(self, name):
+        if name not in client_attrs:
+            raise AttributeError("'Client' object has no attribute '%s'" % name)
+        else:
+            return noop
+
+
+client = DummyClient()
+
 
 def create_client(app_config):
-    if not client:
-        global client
+    global client
 
+    if not client:
         mem_config = app_config['memcached']
 
         mem_url = "%s:%s" % (mem_config['host'], mem_config['port'])
@@ -17,3 +31,19 @@ def create_client(app_config):
         client = memcache.Client([mem_url], debug = debug)
 
     return client
+
+if __name__ == "__main__":
+
+    try:
+        client.xxx()
+        raise Exception('client.xxx is not raise an exception')
+
+    except AttributeError, e:
+        pass
+
+    except Exception, e:
+        raise Exception
+
+
+    assert(client.get('name') == None)
+    assert(client.set('name', 'value') == None)
