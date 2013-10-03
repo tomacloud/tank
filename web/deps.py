@@ -12,6 +12,7 @@ from tornado.web import RequestHandler
 from tornado.web import Application
 from tornado.web import HTTPError
 from tornado import ioloop
+from tornado import escape
 
 import tornado.escape
 
@@ -99,13 +100,15 @@ def need_login(func):
 
 class BaseHandler(RequestHandler):
 
+    USER_TOKEN_COOKIE = "user_token"
+
     def initialize(self, app_config, Session):
         self.app_config = app_config
         self.Session = Session
         self.db_session = None
 
     def get_current_user(self):
-        user_token = self.get_cookie('user_token')
+        user_token = self.get_cookie(self.USER_TOKEN_COOKIE)
         if not user_token:
             return None
 
@@ -231,6 +234,10 @@ class BaseHandler(RequestHandler):
         kwargs["db_session"] = self.get_db_session()
         kwargs['handler'] = self
         return RequestHandler.render(self, template_name, **kwargs)
+
+    def backurl_or_redirect(self, url):
+        url = escape.url_unescape(self.get_argument('back_url', '')) or url
+        self.redirect(url)
     
 def seed_user_token_cookie(cookie_name = None):
 
