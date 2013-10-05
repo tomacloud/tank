@@ -42,3 +42,20 @@ class WebRequest:
 
     def is_index(self):
         return self.get_module_size() == 0
+
+    def build_url(self, params = {}, removes = []):
+        url = self.path
+        _param_list = []
+
+        if self.params:
+            for p in self.params:
+                if p not in params and p not in removes:
+                    params[p] = self.params[p]
+
+        if params:
+            for k, v in params.iteritems():
+                _param_list.append("%s=%s" % (k, v))
+
+            url += "?" + "&".join(_param_list)
+
+        return url
