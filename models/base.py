@@ -7,7 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy import Table, MetaData, Column
 from sqlalchemy import Integer, String, Unicode, UnicodeText, Boolean, DateTime, Float, Text, Binary, DECIMAL
 from sqlalchemy.orm import mapper, class_mapper
-from sqlalchemy import func, or_, desc
+from sqlalchemy import func, and_, or_, desc
 
 #metadata = MetaData()
 

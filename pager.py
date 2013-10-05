@@ -28,6 +28,9 @@ class Pager():
 
             self.url = '%s%s' % (prefix, suffix)
             self.page = int(m.group(1))
+
+            if not self.page:
+                self.page = 1
         else:
             self.page = 1
             self.url = url
