@@ -91,6 +91,7 @@ def need_login(func):
             user = handler.get_current_user()
             if not user:
                 uri = handler.request.uri
+                uri = escape.url_escape(uri)
                 return handler.redirect("/login?back_url=" + uri)
 
         return func(*args, **kwargs)
