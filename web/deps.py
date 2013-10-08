@@ -81,7 +81,7 @@ def decode_user_token(user_token):
 
     return None, params
 
-def need_login(func):
+def _need_login(func, path):
     def wrapper(*args, **kwargs):
         handler = None
         if len(args) > 0:
@@ -92,12 +92,18 @@ def need_login(func):
             if not user:
                 uri = handler.request.uri
                 uri = escape.url_escape(uri)
-                return handler.redirect("/login?back_url=" + uri)
+                return handler.redirect(path + "?back_url=" + uri)
 
         return func(*args, **kwargs)
 
     return wrapper
 
+
+def need_login(func):
+    return _need_login(func, "/login")
+
+def need_admin_login(func):
+    return _need_login(func, "/admin/login")
 
 class BaseHandler(RequestHandler):
 
