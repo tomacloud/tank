@@ -51,6 +51,16 @@ if __name__ == '__main__':
         )
     
     print settings
+
+
+    if app_config.has_key("startpoint") and app_config["startpoint"]:
+        """
+        `startpoint.py` can be imported in somewhere your project.
+        Defualt place in `$PROJECT_ROOT/src/startpoint.py`
+        The file will initialize your project, something tank not did.
+        """
+        import startpoint
+        startpoint.__init__(app_config)
     
     def build_handler(path, handler):
         return (path, handler,
