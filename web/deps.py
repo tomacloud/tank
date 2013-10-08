@@ -182,6 +182,7 @@ class BaseHandler(RequestHandler):
         namespace["emmed_css"] = self._emmed_css
         namespace["emmed_js"] = self._emmed_js
         namespace["ui_list"] = self._ui_list
+        namespace["u"] = tornado.util.u
         
         return namespace
 
