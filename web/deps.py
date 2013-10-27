@@ -10,7 +10,6 @@ import md5
 
 from tornado.web import RequestHandler
 from tornado.web import Application
-from tornado.web import HTTPError
 from tornado import ioloop
 from tornado import escape
 
@@ -136,53 +135,13 @@ class BaseHandler(RequestHandler):
         return self.Session()
         """
         return self.db_session
-
-
-    def _emmed_css(self, *args):
-        css_path = "%s/src/static/css/" % (self.app_config['running_home'])
-        content = ""
-
-        for i in range(len(args)):
-            css_file = "%s%s" % (css_path, args[i])
-
-            handler = open(css_file, "r")
-            content += handler.read()
-            handler.close()
-
-        return content
-
-    def _emmed_js(self, *args):
-        js_path = "%s/src/static/js/" % (self.app_config['running_home'])
-        content = ""
-
-        for i in range(len(args)):
-            js_file = "%s%s" % (js_path, args[i])
-
-            handler = open(js_file, "r")
-            content += handler.read()
-            handler.close()
-
-        return content
-    
-    def _ui_list(self, html, data):
-        temp = html.replace("%%", "");
-        param_num = len(temp) - len(temp.replace("%", ""))
-        content = ''
-
-        for d in data:
-            if len([None for i in range(param_num) if d[i] is None]) > 0:
-                continue
-
-            content += html % d
-
-        return content
         
     def get_template_namespace(self):
         namespace = RequestHandler.get_template_namespace(self)
-        namespace["emmed_css"] = self._emmed_css
-        namespace["emmed_js"] = self._emmed_js
-        namespace["ui_list"] = self._ui_list
         namespace["u"] = tornado.util.u
+        namespace["app_config"] = self.app_config
+        namespace["db_session"] = self.get_db_session()
+        namespace['handler'] = self
         
         return namespace
 
@@ -224,29 +183,18 @@ class BaseHandler(RequestHandler):
         self.write(json.dumps(ret))
         self.finish()
 
-    def write_error(self, status_code, **kwargs):
-        exc_info = kwargs['exc_info']
-        traceback.print_exception(*exc_info)
-        
-        err_msg = u"服务器开小差啦, 请稍后再试"
-
-        if status_code == 404:
-            err_msg = u"对不起, 您访问的页面不存在"
-            
-        data = { 'err_msg' : err_msg }
-        
-        self.render('mouse/error.tpl', **data)
-
-    def render(self, template_name, **kwargs):
-        kwargs["app_config"] = self.app_config
-        kwargs["db_session"] = self.get_db_session()
-        kwargs['handler'] = self
-        return RequestHandler.render(self, template_name, **kwargs)
-
     def backurl_or_redirect(self, url):
         url = escape.url_unescape(self.get_argument('back_url', '')) or url
         self.redirect(url)
-    
+
+    def write_error(self, status_code, **kwargs):
+        if kwargs.has_key('exc_info'):
+            exc_info = kwargs['exc_info']
+            traceback.print_exception(*exc_info)
+
+        return RequestHandler.write_error(self, status_code, **kwargs)
+
+
 def seed_user_token_cookie(cookie_name = None):
 
     def _seed(func):

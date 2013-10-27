@@ -8,15 +8,6 @@ from tank.models.base import SessionHolder
 from tank.web.deps import *
 from tank.web.handlers import *
 
-class NotFoundHandler(BaseHandler):
-    
-    def get(self):
-        raise HTTPError(404)
-    
-    def post(self):
-        raise HTTPError(404)
-
-
 if __name__ == '__main__':
 
     from tornado.options import define, options
@@ -77,8 +68,6 @@ if __name__ == '__main__':
             module = __import__(handler_module, fromlist=[''])
             print handler_module, module
             handlers += module.get_handlers(app_config, Session)
-            
-    handlers += [build_handler(r'.*', NotFoundHandler)]
     
     app = Application(handlers, **settings)
 
