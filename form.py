@@ -4,17 +4,26 @@
 from tank.validator.validator import Validator 
 
 class Form:
+
+    __attrs__ = {}
+    __rules = []
+        
     def __init__(self, **kvargs):
         self.locale_translate = None
         self.scenario = None
         self._errors = {}
 
         for k, v in self.__attrs__.iteritems():
+
             if kvargs and kvargs.has_key(k):
                 value = kvargs[k]
+
+            elif isinstance(v, tuple) and len(v) >= 2:
+                value = v[1]
+
             else:
-                value = v
-            
+                value = ''
+
             setattr(self, k, value)
 
     @classmethod
@@ -26,11 +35,23 @@ class Form:
         if locale:
             obj.locale_translate = locale.translate
 
-        for k in obj.__attrs__.keys():
+        for k, v in obj.__attrs__.iteritems():
             value = handler.get_argument(k, '')
             setattr(obj, k, value)
 
         return obj
+
+    def get_attribute_label(self, attribute):
+        value = self.__attrs__.get(attribute)
+
+        if isinstance(value, tuple):
+            return value[0]
+
+        elif isinstance(value, (str, unicode)):
+            return value
+
+        else:
+            return attribute
 
     def create_validators(self):
         if not hasattr(self, '__rules__'): return
@@ -122,24 +143,39 @@ class Form:
                 del self._errors[attribute]
 
 
-
 if __name__ == "__main__":
 
     from tornado import locale
 
     class LoginForm(Form):
         __attrs__ = dict(
-            email  = None,
-            passwd = None
+            name = ("Name", ),
+            email = None,
+            passwd = None,
+            confirm_passwd = None
         )
 
         __rules__ = [
-            ('email, passwd', 'required'),
+            ('name, email, passwd', 'required'),
+            ('name', 'string', dict( string_min = 6, string_max = 12 )),
+            ('name', 'regular', dict( pattern = r"^[a-zA-Z][a-zA-Z0-9]+$", message = "Name has wrong format." )),
             ('email', 'email'),
-            ('passwd', 'string', { 'min': 6, 'max': 12 }),
+            ('confirm_passwd', 'confirm_passwd_validate')
         ]
 
-    form = LoginForm(email = "lovekona", passwd = "123")
+        def confirm_passwd_validate(self, attribute):
+            _ = form.locale_translate
+
+            if self.passwd != self.confirm_passwd:
+                self.add_error(attribute, _("confirm passwd not correct."))
+
+    form = LoginForm(
+        name = "yinwmfjsdlkfjsdlajlkjsdlkfjdsklfkdjsjfldslkf",
+        email = "lovekona@gmail.com",
+        passwd = "123",
+        confirm_passwd = "123"
+    )
+
     form.locale_translate = locale.get('en_US').translate
 
     print form.validate()

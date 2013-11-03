@@ -5,9 +5,17 @@ import re
 
 def get_validator_cls(name):
     from .required import RequiredValidator
+    from .regular import RegularValidator
+    from .inline import InlineValidator
+    from .email import EmailValidator
+    from .string import StringValidator
 
     cls_map = dict(
-        required = RequiredValidator
+        required = RequiredValidator,
+        regular  = RegularValidator,
+        inline   = InlineValidator,
+        email    = EmailValidator,
+        string   = StringValidator,
     )
 
     if cls_map.has_key(name):
@@ -59,8 +67,14 @@ class Validator:
             excepts = []
             
 
-        if hasattr(form, name): # inline validate
-            pass
+        if name.endswith('_validate') and hasattr(form, name) and \
+           hasattr(getattr(form, name), '__call__'): # inline validate
+
+            validator = get_validator_cls('inline')()
+            validator.method = name
+            validator.attributes = attributes
+            validator.params = params
+            
         else:
             params['attributes'] = attributes
 
@@ -107,7 +121,7 @@ class Validator:
         @param tank.form.Form form the data object being validated
         @param str attribute the name of the attribute to be validated.
         """
-        pass
+        raise ValueError("validate_attribute not implement.")
 
         
     def add_error(self, form, attribute, message):
@@ -126,7 +140,7 @@ class Validator:
 	A validator applies to a scenario as long as any of the following conditions is met:
 	
         1) the validator's "on" property is empty
-        2) <li>the validator's "on" property contains the specified scenario
+        2) the validator's "on" property contains the specified scenario
         @param string scenario scenario name
         @return boolean whether the validator applies to the specified scenario.
         """
@@ -136,5 +150,5 @@ class Validator:
         return not self.on or scenario in self.on
 
 
-    def is_emtpy(self, value, trim=False):
+    def is_empty(self, value, trim=False):
         return not value or trim and not value.strip()

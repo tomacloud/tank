@@ -35,10 +35,10 @@ class RequiredValidator(Validator):
                     message = _("{0} must be {1}.").format(_(attribute), self.required_value)
 
                 self.add_error(form, attribute, message)
-        elif self.is_emtpy(value, self.trim):
+        elif self.is_empty(value, self.trim):
             if self.message:
-                message = self.message
+                message = _(self.message)
             else:
-                message = _("{0} cannot be blank.").format(_(attribute))
+                message = _("{0} cannot be blank.").format(_(form.get_attribute_label(attribute)))
 
             self.add_error(form, attribute, message)
