@@ -118,6 +118,12 @@ class Form:
         else:
             return self._errors[attribute] if self._errors.has_key(attribute) else []
 
+    def get_first_error(self, attribute, or_=""):
+        if self._errors.has_key(attribute) and len(self._errors[attribute]) > 0:
+            return self._errors[attribute][0]
+        else:
+            return None
+
     def get_error(self, attribute):
         return self._errors[attribute] if self._errors.has_key(attribute) else None
 

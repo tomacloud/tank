@@ -80,7 +80,7 @@ def decode_user_token(user_token):
 
     return None, params
 
-def _need_login(func, path):
+def base_need_login(func, path = "login"):
     def wrapper(*args, **kwargs):
         handler = None
         if len(args) > 0:
@@ -99,10 +99,10 @@ def _need_login(func, path):
 
 
 def need_login(func):
-    return _need_login(func, "/login")
+    return base_need_login(func, "/login")
 
 def need_admin_login(func):
-    return _need_login(func, "/admin/login")
+    return base_need_login(func, "/admin/login")
 
 class BaseHandler(RequestHandler):
 
