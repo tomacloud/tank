@@ -27,11 +27,8 @@ if __name__ == '__main__':
 
     Session = config.build_db_session(app_config)
     SessionHolder(Session)
-    if app_config.has_key('memcached'):
-        from tank import mc
-        mc.create_client(app_config)
-
     debug = app_config['runtime'] == 'development'
+
 
 
     settings = dict(
@@ -40,6 +37,18 @@ if __name__ == '__main__':
         template_path   = "%s/src/tpls/" % (app_config['running_home']),
         login_url       = '/signin',
         )
+
+
+    if app_config.has_key('mongodb'):
+        from pymongo import MongoClient
+        mongo_conf = app_config['mongodb']
+        conn = MongoClient(mongo_conf['host'], mongo_conf['port'])
+        settings['mongo_conn'] = conn
+
+    if app_config.has_key('memcached'):
+        from tank import mc
+        mc.create_client(app_config)
+
     
     print settings
 

@@ -220,3 +220,8 @@ def web_ret():
         err_msg  = '',
         result   = {},
         )
+
+def build_handler(path, handler, app_config, Session):
+    return (path, handler,
+            dict(app_config = app_config,
+                 Session    = Session))
