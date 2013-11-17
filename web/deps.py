@@ -80,7 +80,7 @@ def decode_user_token(user_token):
 
     return None, params
 
-def base_need_login(func, path = "login"):
+def base_need_login(func, path = "login", params = None, hash_ = None):
     def wrapper(*args, **kwargs):
         handler = None
         if len(args) > 0:
@@ -91,7 +91,18 @@ def base_need_login(func, path = "login"):
             if not user:
                 uri = handler.request.uri
                 uri = escape.url_escape(uri)
-                return handler.redirect(path + "?back_url=" + uri)
+                redirect_url = path + "?back_url=" + uri
+
+                if params:
+                    param_arr = []
+                    for k, v in params.iteritems():
+                        param_arr.append('%s=%s' % (k, v))
+                    redirect_url += '&' + '&'.join(param_arr)
+
+                if hash_:
+                    redirect_url += '#' + hash_
+
+                return handler.redirect(redirect_url)
 
         return func(*args, **kwargs)
 
