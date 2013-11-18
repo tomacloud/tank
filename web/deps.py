@@ -225,3 +225,31 @@ def build_handler(path, handler, app_config, Session):
     return (path, handler,
             dict(app_config = app_config,
                  Session    = Session))
+
+def jsonize(func):
+
+    def deal_createtime(d):
+        if isinstance(d, dict):
+            if '_id' in d:
+                del d['_id']
+            for k, v in d.iteritems():
+                d[k] = deal_createtime(v)
+        elif isinstance(d, list):
+            d = [deal_createtime(v) for v in d]
+        elif isinstance(d, datetime.datetime):
+            d = d.strftime('%a, %d %b %Y %H:%M:%S GMT')
+
+        return d
+            
+    
+    def wrapper(*args, **kwargs):
+        handler = args[0]
+        data = func(*args, **kwargs)
+
+        data = deal_createtime(data)
+        handler.write(json.dumps(data))
+
+        handler.set_header('Content-Type', 'application/json')
+
+
+    return wrapper
