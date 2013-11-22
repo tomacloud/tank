@@ -12,6 +12,7 @@ from tornado.web import RequestHandler
 from tornado.web import Application
 from tornado import ioloop
 from tornado import escape
+from tornado.websocket import WebSocketHandler
 
 import tornado.escape
 
@@ -253,3 +254,10 @@ def jsonize(func):
 
 
     return wrapper
+
+class WebSocketBaseHandler(WebSocketHandler):
+
+    def initialize(self, app_config, Session):
+        self.app_config = app_config
+        self.Session = Session
+        self.db_session = None
