@@ -237,7 +237,7 @@ def jsonize(func):
         elif isinstance(d, list):
             d = [deal_createtime(v) for v in d]
         elif isinstance(d, datetime.datetime):
-            d = d.strftime('%a, %d %b %Y %H:%M:%S GMT')
+            d = d.strftime('%Y-%m-%dT%H:%M:%SZ')
 
         return d
             
