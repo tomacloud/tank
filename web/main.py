@@ -53,6 +53,7 @@ if __name__ == '__main__':
     print settings
 
 
+    _startpoint = None
     if app_config.has_key("startpoint") and app_config["startpoint"]:
         """
         `startpoint.py` can be imported in somewhere your project.
@@ -61,6 +62,7 @@ if __name__ == '__main__':
         """
         import startpoint
         startpoint.__init__(app_config)
+        _startpoint = startpoint
     
     def build_handler(path, handler):
         return (path, handler,
@@ -81,4 +83,9 @@ if __name__ == '__main__':
     app = Application(handlers, **settings)
 
     app.listen(options.port)
-    ioloop.IOLoop.instance().start()
+    try:
+        ioloop.IOLoop.instance().start()
+    except KeyboardInterrupt:
+        if _startpoint:
+            _startpoint.__stop__(app_config)
+        ioloop.IOLoop.instance().stop()
