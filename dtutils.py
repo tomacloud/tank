@@ -63,5 +63,19 @@ def date_before_someday(days = 1, someday = None):
 
     return someday - datetime.timedelta(days=days)
 
+def parse_datetime(d, format='%Y-%m-%dT%H:%M:%SZ'):
+    if isinstance(d, dict):
+        if '_id' in d:
+            del d['_id']
+        for k, v in d.iteritems():
+            d[k] = parse_datetime(v, format)
+    elif isinstance(d, list):
+        d = [parse_datetime(v, format) for v in d]
+    elif isinstance(d, datetime.datetime):
+        d = d.strftime(format)
+
+    return d
+            
+
 if __name__ == '__main__':
     print now_str()

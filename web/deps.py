@@ -12,6 +12,7 @@ from tornado.web import RequestHandler
 from tornado.web import Application
 from tornado import ioloop
 from tornado import escape
+from tornado.websocket import WebSocketHandler
 
 import tornado.escape
 
@@ -231,3 +232,29 @@ def web_ret():
         err_msg  = '',
         result   = {},
         )
+
+def build_handler(path, handler, app_config, Session):
+    return (path, handler,
+            dict(app_config = app_config,
+                 Session    = Session))
+
+def jsonize(func):
+    
+    def wrapper(*args, **kwargs):
+        handler = args[0]
+        data = func(*args, **kwargs)
+
+        data = dtutils.parse_datetime(data)
+        handler.write(json.dumps(data))
+
+        handler.set_header('Content-Type', 'application/json')
+
+
+    return wrapper
+
+class WebSocketBaseHandler(WebSocketHandler):
+
+    def initialize(self, app_config, Session):
+        self.app_config = app_config
+        self.Session = Session
+        self.db_session = None
