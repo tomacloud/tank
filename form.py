@@ -148,6 +148,11 @@ class Form:
             if self._errors.has_key(attribute):
                 del self._errors[attribute]
 
+    def popultate(self, model):
+        for k, v in self.__attrs__.iteritems():
+            if hasattr(model, k):
+                setattr(model, k, getattr(self, k))
+
 
 if __name__ == "__main__":
 
