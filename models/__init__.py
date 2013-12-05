@@ -2,4 +2,4 @@
 # -*- coding:utf-8 -*-
 
 
-from .base import Entity, Base
+from .base import Entity, Base, gt, ge, lt, le

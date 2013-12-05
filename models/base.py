@@ -39,6 +39,57 @@ class QueryableEntity(type):
 print  QueryableEntity        
 """
 
+class QueryCondition(object):
+
+    def __init__(self, value):
+        self.value = value
+
+class ConditionGT(QueryCondition):
+
+    def __init__(self, value):
+        QueryCondition.__init__(self, value)
+
+    def get_condition(self, col):
+        return col > self.value
+
+class ConditionGE(QueryCondition):
+
+    def __init__(self, value):
+        QueryCondition.__init__(self, value)
+
+    def get_condition(self, col):
+        return col >= self.value
+
+class ConditionLT(QueryCondition):
+
+    def __init__(self, value):
+        QueryCondition.__init__(self, value)
+
+    def get_condition(self, col):
+        return col < self.value
+
+class ConditionLE(QueryCondition):
+
+    def __init__(self, value):
+        QueryCondition.__init__(self, value)
+
+    def get_condition(self, col):
+        return col <= self.value
+    
+
+def gt(value):
+    return ConditionGT(value)
+
+def ge(value):
+    return ConditionGE(value)
+
+def lt(value):
+    return ConditionLT(value)
+
+def le(value):
+    return ConditionLE(value)
+
+
 class Singleton(type):
     _instances = {}
     def __call__(cls, *args, **kwargs):
@@ -208,6 +259,8 @@ class Entity(object):
         for k, v in kvargs.iteritems():
             if isinstance(v, list):
                 q = q.filter(cols[k].in_(v))
+            elif isinstance(v, QueryCondition):
+                q = q.filter(v.get_condition(cols[k]))
             else:
                 q = q.filter(cols[k] == v)
 
