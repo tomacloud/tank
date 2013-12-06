@@ -153,9 +153,9 @@ def build_db_session(app_config):
     connect_args = {
         'user': app_config['mysql']['username'],
         'passwd': app_config['mysql']['password'],
-        'charset': 'utf8'
+        'charset': 'utf8mb4'
         }
-    db_url = 'mysql://%s:%s/%s?charset=utf8&use_unicode=1' \
+    db_url = 'mysql://%s:%s/%s?charset=utf8mb4&use_unicode=1' \
              % (app_config['mysql']['host_master'],
                 app_config['mysql']['port_master'],
                 app_config['mysql']['database'],
