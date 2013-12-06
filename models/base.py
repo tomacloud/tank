@@ -156,10 +156,10 @@ class Entity(object):
         return self.__repr__()
 
     def _get_ext_fields(self):
-        if not hasattr(self, '__ext_fields'):
-            setattr(self, '__ext_fields', {})
+        if not hasattr(self, '__ext_fields__'):
+            setattr(self, '__ext_fields__', {})
 
-        return getattr(self, '__ext_fields')
+        return getattr(self, '__ext_fields__')
 
     def __repr__(self):
         s = "<" + self.__table__.name + ">\n"
