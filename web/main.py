@@ -49,6 +49,14 @@ if __name__ == '__main__':
         from tank import mc
         mc.create_client(app_config)
 
+    if app_config.has_key('redis'):
+        import redis
+        redis_conf = app_config['redis']
+        r = redis.StrictRedis(
+            host=redis_conf['host'],
+            port=redis_conf['port'],
+            db=redis_conf['db'])
+        app_config['redis_client'] = r
     
     print settings
 

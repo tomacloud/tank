@@ -4,6 +4,8 @@
 import datetime
 import time
 
+from tank.models import Entity
+
 def now_timestamp():
     return int(time.time())
 
@@ -69,6 +71,8 @@ def parse_datetime(d, format='%Y-%m-%dT%H:%M:%SZ'):
             del d['_id']
         for k, v in d.iteritems():
             d[k] = parse_datetime(v, format)
+    elif isinstance(d, Entity):
+        d = parse_datetime(d.toDict(), format)
     elif isinstance(d, list):
         d = [parse_datetime(v, format) for v in d]
     elif isinstance(d, datetime.datetime):
