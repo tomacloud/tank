@@ -236,6 +236,24 @@ class Entity(object):
     def get_all(cls, db_session = None, **kvargs):
         return cls.get_all_by(db_session, **kvargs)
 
+
+    @classmethod
+    @SessionHolder.need_session
+    def count(cls, db_session = None, **kvargs):
+        name = class_mapper(cls).primary_key[0].name
+        q = db_session.query(func.count(getattr(cls, name)))
+        cols = cls.__table__.c
+
+        for k, v in kvargs.iteritems():
+            if isinstance(v, list):
+                q = q.filter(cols[k].in_(v))
+            elif isinstance(v, QueryCondition):
+                q = q.filter(v.get_condition(cols[k]))
+            else:
+                q = q.filter(cols[k] == v)
+
+        return q.first()[0]
+
     @classmethod
     def _get_query(cls, db_session, **kvargs):
         q = db_session.query(cls)
