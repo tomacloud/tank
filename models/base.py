@@ -144,14 +144,6 @@ class Entity(object):
 
     __ignore_fields__ = []
 
-    @classmethod
-    def get_db_session(cls):
-        from tank import config
-        Session = config.build_db_session(app_config)
-
-        
-        
-
     def __str__(self):
         return self.__repr__()
 
