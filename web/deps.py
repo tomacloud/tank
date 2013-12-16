@@ -195,6 +195,16 @@ class BaseHandler(RequestHandler):
         self.write(json.dumps(ret))
         self.finish()
 
+    def write_err_web_ret(self, err_code = 1000, err_msg = '', ret = None):
+
+        if not ret:
+            ret = web_ret()
+
+        ret['err_code'] = err_code
+        ret['err_msg'] = err_msg
+
+        self.write_web_ret(ret)
+
     def backurl_or_redirect(self, url):
         url = escape.url_unescape(self.get_argument('back_url', '')) or url
         self.redirect(url)
