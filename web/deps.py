@@ -195,8 +195,12 @@ class BaseHandler(RequestHandler):
         self.write(json.dumps(ret))
         self.finish()
 
-    def write_err_web_ret(self, err_code = 1000, err_msg = '', ret = None):
+    def write_web_callback(self, callback, ret):
+        string = "<script>parent.%s(%s)</script>" % (callback, json.dumps(ret))
+        print string
+        self.write(string)
 
+    def write_err_web_ret(self, err_code = 1000, err_msg = '', ret = None):
         if not ret:
             ret = web_ret()
 
