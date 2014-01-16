@@ -157,10 +157,12 @@ class Entity(object):
         s = "<" + self.__table__.name + ">\n"
 
         ext_fields = self._get_ext_fields()
-        for name, v in ext_fields.iteritems():
+        for f in ext_fields:
+            v = getattr(self, f)
             if isinstance(v, unicode):
                 v = v.encode('utf8')
-            s += "\t%s=%s\n" % (name, v)
+
+            s += "\t%s=%s\n" % (f, v)
             
         for c in self.__table__.columns:
             v = getattr(self, c.name)
@@ -171,15 +173,14 @@ class Entity(object):
         return s
 
     def attach_ext_field(self, name, value):
-        ext_fields = self._get_ext_fields()
-        ext_fields[name] = value
+        setattr(self, name, valeu)
 
     def toDict(self):
         d = {}
         ext_fields = self._get_ext_fields()
-        for name, v in ext_fields.iteritems():
-            if not name in self.__ignore_fields__:
-                d[name] = v
+        for f in ext_fields:
+            if not f in self.__ignore_fields__:
+                d[f] = getattr(self, f)
 
         for c in self.__table__.columns:
             if not c.name in self.__ignore_fields__:
