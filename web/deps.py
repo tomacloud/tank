@@ -263,6 +263,8 @@ def jsonize(func):
 
         handler.set_header('Content-Type', 'application/json')
 
+        print 'Finish jsonize', datetime.datetime.now()
+
 
     return wrapper
 
