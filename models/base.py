@@ -76,6 +76,14 @@ class ConditionLE(QueryCondition):
     def get_condition(self, col):
         return col <= self.value
     
+class ConditionNot(QueryCondition):
+
+    def __init__(self, value):
+        QueryCondition.__init__(self, value)
+
+    def get_condition(self, col):
+        return col != self.value
+    
 
 def gt(value):
     return ConditionGT(value)
@@ -88,6 +96,9 @@ def lt(value):
 
 def le(value):
     return ConditionLE(value)
+
+def neq(value):
+    return ConditionNot(value)
 
 
 class Singleton(type):
