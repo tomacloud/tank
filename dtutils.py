@@ -77,6 +77,8 @@ def parse_datetime(d, format='%Y-%m-%dT%H:%M:%SZ'):
         d = [parse_datetime(v, format) for v in d]
     elif isinstance(d, datetime.datetime):
         d = d.strftime(format)
+    elif isinstance(d, datetime.date):
+        d = d.strftime('%Y-%m-%d')
 
     return d
             
