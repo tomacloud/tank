@@ -3,7 +3,7 @@
 
 from tank.validator.validator import Validator 
 
-class Form:
+class Form(object):
 
     __attrs__ = {}
     __rules = []
@@ -58,7 +58,9 @@ class Form:
 
         validators = []
 
-        for rule in self.__rules__:
+        rules = getattr(self, '__rules__')
+
+        for rule in rules:
             if rule[0] and rule[1]:
 
                 if len(rule) >= 3:
@@ -72,7 +74,7 @@ class Form:
         return validators
 
     def get_validators(self, attribute = None):
-        if not hasattr(self, '_validators') or not self._validators:
+        if not hasattr(self, '_validators') or not getattr(self, '_validators'):
             self._validators = self.create_validators()
 
         validators = []

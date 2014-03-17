@@ -72,15 +72,15 @@ if __name__ == '__main__':
         startpoint.__init__(app_config)
         _startpoint = startpoint
     
-    def build_handler(path, handler):
+    def _build_handler(path, handler):
         return (path, handler,
                 dict(app_config = app_config,
                      Session    = Session))
 
     from tank.web.handlers.stat import UserStatHandler
     handlers = [ #build_handler(r'/', IndexHandler),
-                 build_handler(r'/__user_stat/([\w_]+)/([\w_]+)/([\w_]+)', UserStatHandler),
-                 ]
+        _build_handler(r'/__user_stat/([\w_]+)/([\w_]+)/([\w_]+)', UserStatHandler),
+        ]
 
     if 'application' in app_config and 'handlers' in app_config['application']:
         for handler_module in app_config['application']['handlers']:
@@ -95,5 +95,10 @@ if __name__ == '__main__':
         ioloop.IOLoop.instance().start()
     except KeyboardInterrupt:
         if _startpoint:
-            _startpoint.__stop__(app_config)
+            if hasattr(_startpoint, '__stop__'):
+                __stop__ = getattr(_startpoint, '__stop__')
+                try:
+                    __stop__(app_config)
+                except:
+                    pass
         ioloop.IOLoop.instance().stop()

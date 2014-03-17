@@ -184,7 +184,7 @@ class Entity(object):
         return s
 
     def attach_ext_field(self, name, value):
-        setattr(self, name, valeu)
+        setattr(self, name, value)
 
     def toDict(self):
         d = {}
@@ -222,9 +222,9 @@ class Entity(object):
             else:
                 db_session.merge(self)
 
-            db_session.flush()
             if new:
                 setattr(self, pk.name, db_session.scalar("SELECT LAST_INSERT_ID()"))
+            db_session.flush()
             
         #with db_session
 
