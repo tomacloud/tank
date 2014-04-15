@@ -23,6 +23,11 @@ class NullClient(object):
 
 client = NullClient()
 
+def get(key):
+    return client.get(key)
+
+def set(key, value):
+    return client.set(key, value)
 
 def create_client(app_config):
     global client
