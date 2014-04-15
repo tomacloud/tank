@@ -61,7 +61,7 @@ def cache(key_template):
                         kwargs[k] = v
 
             tpl_dict = {}
-            for k, v in kwargs.iteritem():
+            for k, v in kwargs.iteritems():
                 if isinstance(v, dict):
                     s = ''
                     for _k in sorted(v.iterkeys()):
