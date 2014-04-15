@@ -238,7 +238,11 @@ class Entity(object):
         pks = class_mapper(cls).primary_key
 
         if len(pks) == 1:
-            cond = {pks[0].name: pk}
+            n = pks[0].name
+            if isinstance(pk, dict):
+                cond[n] = pk[n]
+            else:
+                cond[n] = pk
         else:
             cond = pk
 
