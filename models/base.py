@@ -235,8 +235,16 @@ class Entity(object):
     @cache('entity:pk:{pk}')
     def get_by_pk(cls, pk = None, db_session = None):
         q = db_session.query(cls)
-        name = class_mapper(cls).primary_key[0].name
-        return q.filter_by(**{name : pk}).first()
+        pks = class_mapper(cls).primary_key
+
+        if len(pks) == 1:
+            cond = {pks[0].name: pk}
+        else:
+            cond = pk
+
+        print 'pk', cond
+
+        return q.filter_by(**cond).first()
 
     @classmethod
     @SessionHolder.need_session
@@ -316,9 +324,12 @@ class Entity(object):
         pks = set([pk.name for pk in class_mapper(cls).primary_key])
 
         if keys == pks:
-            pk = list(keys)[0]
-            v = kvargs[pk]
-            return cls.get_by_pk(v, db_session)
+
+            cond = {}
+            for pk in keys:
+                cond[pk] = kvargs[pk]
+
+            return cls.get_by_pk(cond, db_session)
 
         return cls._get_query(db_session, **kvargs).first()
 
