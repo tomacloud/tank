@@ -60,8 +60,17 @@ def cache(key_template):
                     if not kwargs.has_key(k):
                         kwargs[k] = v
 
+            tpl_dict = {}
+            for k, v in kwargs:
+                if isinstance(v, dict):
+                    s = ''
+                    for _k in sorted(v.iterkeys()):
+                        s += "%s=%s&" % (_k, v[_k])
+                    kwargs[k] = s
 
             key = re.sub(r'\{\w+\}', lambda m: (str(kwargs[m.group(0)[1:-1]]) if m.group(0) else m.group(0)), key_template)
+
+            print 'cache key', key
 
             value = client.get(key)
             if not value:
