@@ -24,10 +24,10 @@ class NullClient(object):
 client = NullClient()
 
 def get(key):
-    return client.get(key)
+    return client.get(str(key))
 
 def set(key, value):
-    return client.set(key, value)
+    return client.set(str(key), value)
 
 def create_client(app_config):
     global client
