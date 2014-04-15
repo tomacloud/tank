@@ -239,6 +239,7 @@ class Entity(object):
 
         if len(pks) == 1:
             n = pks[0].name
+            cond = {}
             if isinstance(pk, dict):
                 cond[n] = pk[n]
             else:
