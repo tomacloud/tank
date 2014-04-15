@@ -30,7 +30,7 @@ def create_client(app_config):
     if not client or isinstance(client, NullClient):
         if not app_config.has_key('memcached'):
             client = DummyClient()
-        
+
         mem_config = app_config['memcached']
 
         mem_url = "%s:%s" % (mem_config['host'], mem_config['port'])
@@ -50,16 +50,17 @@ def cache(key_template):
             for k, v in zip(func_args, args):
                 kwargs[k] = v
 
-            for k, v in zip(reversed(func_args), reversed(func_defaults)):
-                if not kwargs.has_key(k):
-                    kwargs[k] = v
+            if func_args:
+                for k, v in zip(reversed(func_args), reversed(func_defaults)):
+                    if not kwargs.has_key(k):
+                        kwargs[k] = v
 
 
             key = re.sub(r'\{\w+\}', lambda m: (str(kwargs[m.group(0)[1:-1]]) if m.group(0) else m.group(0)), key_template)
 
             value = client.get(key)
             if not value:
-                value = func(*args, **kwargs)
+                value = func(*args) #, **kwargs)
                 client.set(key, value)
 
             return value
@@ -85,7 +86,7 @@ if __name__ == "__main__":
         def get_name(self, id=123, name="kona"):
             print 'not use cache'
             return '123'
-    
+
     create_client(app_config)
 
     cache_test = CacheTest()

@@ -3,6 +3,8 @@
 
 import inspect
 
+from tank.mc import cache
+
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy import Table, MetaData, Column
 from sqlalchemy import Integer, String, Unicode, UnicodeText, Boolean, DateTime, Date, Float, Text, Binary, DECIMAL
@@ -31,12 +33,12 @@ class QueryableEntity(type):
 
         def query(*args, **kwargs):
             pass
-        
+
         print 'QUERY able ', name
 
         return query
 
-print  QueryableEntity        
+print  QueryableEntity
 """
 
 class QueryCondition(object):
@@ -75,7 +77,7 @@ class ConditionLE(QueryCondition):
 
     def get_condition(self, col):
         return col <= self.value
-    
+
 class ConditionNot(QueryCondition):
 
     def __init__(self, value):
@@ -83,7 +85,7 @@ class ConditionNot(QueryCondition):
 
     def get_condition(self, col):
         return col != self.value
-    
+
 
 def gt(value):
     return ConditionGT(value)
@@ -147,7 +149,7 @@ class SessionHolder(object):
                     return func(*args, **kwargs)
 
         return wrapper
-    
+
 
 class Entity(object):
 
@@ -174,7 +176,7 @@ class Entity(object):
                 v = v.encode('utf8')
 
             s += "\t%s=%s\n" % (f, v)
-            
+
         for c in self.__table__.columns:
             v = getattr(self, c.name)
             if isinstance(v, unicode):
@@ -225,11 +227,12 @@ class Entity(object):
             if new:
                 setattr(self, pk.name, db_session.scalar("SELECT LAST_INSERT_ID()"))
             db_session.flush()
-            
+
         #with db_session
 
     @classmethod
     @SessionHolder.need_session
+    @cache('entity:pk:{pk}')
     def get_by_pk(cls, pk = None, db_session = None):
         q = db_session.query(cls)
         name = class_mapper(cls).primary_key[0].name
@@ -302,12 +305,21 @@ class Entity(object):
         if offset:
             q = q.offset(offset)
 
-        
+
         return q
 
     @classmethod
     @SessionHolder.need_session
     def get_by(cls, db_session = None, **kvargs):
+
+        keys = set(kvargs.keys())
+        pks = set([pk.name for pk in class_mapper(cls).primary_key])
+
+        if keys == pks:
+            pk = list(keys)[0]
+            v = kvargs[pk]
+            return cls.get_by_pk(v, db_session)
+
         return cls._get_query(db_session, **kvargs).first()
 
     @classmethod
