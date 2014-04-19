@@ -248,8 +248,11 @@ class Entity(object):
             cond = pk
 
         print 'pk', cond
-
-        return q.filter_by(**cond).first()
+        values = cond.values()
+        if len(values) >= 1 or values[0]:
+            return q.filter_by(**cond).first()
+        else:
+            return None
 
     @classmethod
     @SessionHolder.need_session
