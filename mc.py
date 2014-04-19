@@ -27,7 +27,7 @@ def get(key):
     return client.get(str(key))
 
 def set(key, value):
-    return client.set(str(key), value)
+    return client.set(str(key), value, time=3600)
 
 def delete(key):
     return client.delete(str(key))
