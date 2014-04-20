@@ -222,6 +222,7 @@ class Entity(object):
                     s += "%s=%s&" % (_k, v[_k])
                 pk_values[k] = s
 
+        print 'pk values', pk_values
         key_template = "entity:pk:{pk}"
         key = re.sub(r'\{\w+\}', lambda m: (str(pk_values[m.group(0)[1:-1]]) if m.group(0) else m.group(0)), key_template)
 
