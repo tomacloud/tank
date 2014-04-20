@@ -216,8 +216,8 @@ class Entity(object):
             pk_values[name]= value
 
         s = ''
-        for _k in sorted(pk_values.iterkeys()):
-            s += "%s=%s&" % (_k, v[_k])
+        for k in sorted(pk_values.iterkeys()):
+            s += "%s=%s&" % (k, pk_values[k])
 
         print 'pk values', s
         key_template = "entity:pk:{pk}"
