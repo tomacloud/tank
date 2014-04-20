@@ -2,8 +2,10 @@
 # -*- coding:utf-8 -*-
 
 import inspect
+import re
 
 from tank.mc import cache
+from tank import mc
 
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy import Table, MetaData, Column
@@ -204,6 +206,28 @@ class Entity(object):
 
     @SessionHolder.need_session
     def delete(self, db_session = None):
+
+        pks = class_mapper(self.__class__).primary_key
+        pk_values = {}
+
+        for pk in pks:
+            name = pk.name
+            value = getattr(self, name)
+            pk_values[name]= value
+
+        for k, v in pk_values.iteritems():
+            if isinstance(v, dict):
+                s = ''
+                for _k in sorted(v.iterkeys()):
+                    s += "%s=%s&" % (_k, v[_k])
+                pk_values[k] = s
+
+        key_template = "entity:pk:{%pk}"
+        key = re.sub(r'\{\w+\}', lambda m: (str(pk_values[m.group(0)[1:-1]]) if m.group(0) else m.group(0)), key_template)
+
+        print 'cache key', key
+        mc.delete(key)
+
         with db_session.begin():
             db_session.delete(self)
             db_session.flush()
