@@ -225,7 +225,7 @@ class Entity(object):
         key_template = "entity:pk:{%pk}"
         key = re.sub(r'\{\w+\}', lambda m: (str(pk_values[m.group(0)[1:-1]]) if m.group(0) else m.group(0)), key_template)
 
-        print 'cache key', key
+        print '------ delete cache key', key
         mc.delete(key)
 
         with db_session.begin():

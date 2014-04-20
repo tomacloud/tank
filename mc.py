@@ -78,7 +78,7 @@ def cache(key_template):
             value = client.get(key)
             if not value:
                 value = func(*args) #, **kwargs)
-                client.set(key, value)
+                client.set(key, value, time=3600)
 
             return value
 
