@@ -71,7 +71,6 @@ def cache(key_template):
                         s += "%s=%s&" % (_k, v[_k])
                     kwargs[k] = s
 
-            print 'pk values in set', kwargs
             key = re.sub(r'\{\w+\}', lambda m: (str(kwargs[m.group(0)[1:-1]]) if m.group(0) else m.group(0)), key_template)
 
             print 'cache key', key

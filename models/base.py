@@ -215,16 +215,13 @@ class Entity(object):
             value = getattr(self, name)
             pk_values[name]= value
 
-        for k, v in pk_values.iteritems():
-            if isinstance(v, dict):
-                s = ''
-                for _k in sorted(v.iterkeys()):
-                    s += "%s=%s&" % (_k, v[_k])
-                pk_values[k] = s
+        s = ''
+        for _k in sorted(pk_values.iterkeys()):
+            s += "%s=%s&" % (_k, v[_k])
 
-        print 'pk values', pk_values
+        print 'pk values', s
         key_template = "entity:pk:{pk}"
-        key = re.sub(r'\{\w+\}', lambda m: (str(pk_values[m.group(0)[1:-1]]) if m.group(0) else m.group(0)), key_template)
+        key = re.sub(r'\{\w+\}', s, key_template)
 
         print '------ delete cache key', key
         mc.delete(key)
