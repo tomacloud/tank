@@ -204,9 +204,7 @@ class Entity(object):
 
         return d
 
-    @SessionHolder.need_session
-    def delete(self, db_session = None):
-
+    def _del_pk_cache(self):
         pks = class_mapper(self.__class__).primary_key
         pk_values = {}
 
@@ -226,12 +224,19 @@ class Entity(object):
         print '------ delete cache key', key
         mc.delete(key)
 
+
+    @SessionHolder.need_session
+    def delete(self, db_session = None):
+        self._del_pk_cache()
+
         with db_session.begin():
             db_session.delete(self)
             db_session.flush()
 
     @SessionHolder.need_session
     def save(self, db_session = None):
+        self._del_pk_cache()
+
         pks = class_mapper(self.__class__).primary_key
         new = False
         if len(pks) == 1:
