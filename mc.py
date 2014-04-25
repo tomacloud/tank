@@ -26,8 +26,8 @@ client = NullClient()
 def get(key):
     return client.get(str(key))
 
-def set(key, value):
-    return client.set(str(key), value, time=3600)
+def set(key, value, time=86400):
+    return client.set(str(key), value, time=time)
 
 def delete(key):
     return client.delete(str(key))
@@ -78,7 +78,7 @@ def cache(key_template):
             value = client.get(key)
             if not value:
                 value = func(*args) #, **kwargs)
-                client.set(key, value, time=3600)
+                client.set(key, value)
 
             return value
 
